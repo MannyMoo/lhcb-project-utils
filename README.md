@@ -3,5 +3,5 @@ Utilities for configuring your linux environment for doing PPE projects, assumin
 To get setup you should just need to do:
 
 ```shell
-sh -c "$(wget https://raw.github.com/MannyMoo/student-project-utils/master/setup.sh -O -)"
+sh -c "$(wget https://raw.github.com/MannyMoo/lhcb-project-utils/master/setup.sh -O -)"
 ```
