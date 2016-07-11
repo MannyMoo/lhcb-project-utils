@@ -1,7 +1,7 @@
 cd 
-git clone git://github.com/MannyMoo/student-project-utils.git
+git clone git://github.com/MannyMoo/lhcb-project-utils.git
 
-echo "source ~/student-project-utils/setup-root.sh
+echo "source ~/lhcb-project-utils/setup-root.sh
 setup_root
 " >> ~/.bash_profile
 
