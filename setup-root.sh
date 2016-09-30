@@ -42,3 +42,4 @@ function setup_root() {
 function setup_lhcb_env() {
     source /afs/cern.ch/lhcb/software/releases/LBSCRIPTS/prod/InstallArea/scripts/LbLogin.sh
 }
+		
