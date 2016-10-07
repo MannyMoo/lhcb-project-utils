@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ ! -e ~/lib/bash ] ;
+if [ ! -e ~/lib/bash ] ; then
     mkdir -p ~/lib/bash
 fi
 cd ~/lib/bash
