@@ -40,6 +40,25 @@ function setup_root() {
 }
 
 function setup_lhcb_env() {
-    source /afs/cern.ch/lhcb/software/releases/LBSCRIPTS/prod/InstallArea/scripts/LbLogin.sh
+    local RELEASE="`cat /etc/redhat-release`"
+    # Use a newer version of python than default if we're on slc5.
+    if [ `expr match "$RELEASE" ".*5\."` -ne 0 ] ; then
+        # The latest version of LbScripts uses python syntax that's not supported by the ancient
+        # version used by default on ppelx (2.4) so use this one.
+	source /afs/cern.ch/lhcb/software/releases/LBSCRIPTS/LBSCRIPTS_v8r4p3/InstallArea/scripts/LbLogin.sh
+    else
+	source /afs/cern.ch/lhcb/software/releases/LBSCRIPTS/prod/InstallArea/scripts/LbLogin.sh
+    fi
 }
-		
+
+function setup_root_lhcb() {
+    if [ -z "`which lb-run 2> /dev/null`" ]
+    then
+	setup_lhcb_env
+    fi
+    eval "$($LHCBPROJECTUTILSROOT/find-lcg-root-version.py $@)"
+}
+
+function setup_root5_lhcb() {
+    setup_root_lhcb '5\..*'
+}

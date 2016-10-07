@@ -1,6 +1,6 @@
 #!/bin/env python
 
-import os, sys
+import os, sys, re
 from collections import defaultdict
 
 lcgreleasedir = '/afs/cern.ch/sw/lcg/releases/'
@@ -32,9 +32,12 @@ def main() :
     if len(sys.argv) > 1 :
         rootver = sys.argv[1]
         if not rootver in conf :
-            print 'ROOT version', rootver, 'not found for CMTCONFIG', cmtconf
-            print 'Available versions are', sorted(conf.keys())
-            sys.exit(1)
+            matchvers = filter(lambda ver : re.match(rootver, ver), conf)
+            if not matchvers :
+                print 'No match for ROOT version', rootver, ' for CMTCONFIG', cmtconf
+                print 'Available versions are', sorted(conf.keys())
+                sys.exit(1)
+            rootver = sorted(matchvers)[-1]
     else :
         rootver = sorted(conf)[-1]
     print 'SetupProject LCGCMT ' + conf[rootver] + ' ROOT pytools'
