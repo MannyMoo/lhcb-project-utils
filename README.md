@@ -3,5 +3,5 @@ Utilities for configuring your linux environment for doing PPE projects, assumin
 To get setup you should just need to do:
 
 ```shell
-sh -c "$(wget https://raw.github.com/MannyMoo/lhcb-project-utils/master/setup.sh -O -)"
+eval "$(curl -fsSL https://raw.github.com/MannyMoo/lhcb-project-utils/master/setup.sh)"
 ```

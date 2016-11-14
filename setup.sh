@@ -15,4 +15,4 @@ echo 'if [ -e ~/.bashrc ] ; then
     source ~/.bashrc
 fi
 ' >> ~/.bash_profile
-source ~/.bash_profile
+source ~/.bashrc
