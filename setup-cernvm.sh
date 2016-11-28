@@ -20,3 +20,9 @@ sudo yum install cvmfs cvmfs-config-default
 sudo cvmfs_config setup
 scp lxplus.cern.ch:/etc/cvmfs/default.local .
 sudo mv default.local /etc/cvmfs
+sudo yum install svn
+
+# Necessary for grid. Presumably can be installed from some repo, but 
+# couldn't work out which. 
+scp -r lxplus.cern.ch:/etc/grid-security .
+sudo mv grid-security /etc
