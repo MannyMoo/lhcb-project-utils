@@ -1,4 +1,9 @@
 
+# CERN AFS is deprecated.
+#LHCBRELEASEDIR=/afs/cern.ch/lhcb/software/releases/
+LHCBRELEASEDIR=/cvmfs/lhcb.cern.ch/lib/lhcb/
+
+
 function _setup_root() {
     local CMTCONFIG="$1"
     local GCCVERSION="$2"
@@ -41,13 +46,14 @@ function setup_root() {
 
 function setup_lhcb_env() {
     local RELEASE="`cat /etc/redhat-release`"
+    local releasedir=
     # Use a newer version of python than default if we're on slc5.
     if [ `expr match "$RELEASE" ".*5\."` -ne 0 ] ; then
         # The latest version of LbScripts uses python syntax that's not supported by the ancient
         # version used by default on ppelx (2.4) so use this one.
-	source /afs/cern.ch/lhcb/software/releases/LBSCRIPTS/LBSCRIPTS_v8r4p3/InstallArea/scripts/LbLogin.sh
+	source ${LHCBRELEASEDIR}/LBSCRIPTS/LBSCRIPTS_v8r4p3/InstallArea/scripts/LbLogin.sh
     else
-	source /afs/cern.ch/lhcb/software/releases/LBSCRIPTS/prod/InstallArea/scripts/LbLogin.sh
+	source ${LHCBRELEASEDIR}/LBSCRIPTS/prod/InstallArea/scripts/LbLogin.sh
     fi
 }
 
