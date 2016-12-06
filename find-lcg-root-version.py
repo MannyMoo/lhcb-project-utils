@@ -3,15 +3,19 @@
 import os, sys, re
 from collections import defaultdict
 
-lcgreleasedir = '/afs/cern.ch/sw/lcg/releases/'
-
 def get_lcg_releases() :
+    lcgreleasedir = filter(lambda d : 'lcg/releases' in d, 
+                           os.environ['LCG_release_area'].split(':'))[0]
+
     lcgdirs = filter(lambda d : os.path.isdir(os.path.join(lcgreleasedir, d)) and d.split(os.sep)[-1].find('LCG_') == 0, 
                      os.listdir(lcgreleasedir))
     confs = defaultdict(lambda : defaultdict(dict))
     for d in lcgdirs :
         d = os.path.join(lcgreleasedir, d)
-        rootver = os.listdir(os.path.join(d, 'ROOT'))[0]
+        rootdir = os.path.join(d, 'ROOT')
+        if not os.path.isdir(rootdir) :
+            continue 
+        rootver = os.listdir(rootdir)[0]
         if not rootver[0].isdigit() :
             continue
         cmtconfs = os.listdir(os.path.join(d, 'ROOT', rootver))
@@ -40,7 +44,7 @@ def main() :
             rootver = sorted(matchvers)[-1]
     else :
         rootver = sorted(conf)[-1]
-    print 'SetupProject LCGCMT ' + conf[rootver] + ' ROOT pytools'
+    print '. SetupProject.sh LCGCMT ' + conf[rootver] + ' ROOT pytools'
     
 if __name__ == '__main__' :
     main()
