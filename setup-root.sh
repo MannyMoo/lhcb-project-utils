@@ -62,7 +62,15 @@ function setup_root_lhcb() {
     then
 	setup_lhcb_env
     fi
-    eval "$($LHCBPROJECTUTILSROOT/find-lcg-root-version.py $@)"
+    cmd="$($LHCBPROJECTUTILSROOT/find-lcg-root-version.py $@)"
+    exitcode=$?
+    if [ $exitcode = 0 ] ; then
+	eval "$cmd"
+    else 
+	echo "Call of"
+	echo "$LHCBPROJECTUTILSROOT/find-lcg-root-version.py $@"
+	echo "failed with exit code $exitcode"
+    fi
 }
 
 function setup_root5_lhcb() {
