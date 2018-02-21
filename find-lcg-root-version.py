@@ -1,6 +1,6 @@
 #!/bin/env python
 
-import os, sys, re
+import os, sys, re, subprocess
 from collections import defaultdict
 
 def get_lcg_releases() :
@@ -44,7 +44,22 @@ def main() :
             rootver = sorted(matchvers)[-1]
     else :
         rootver = sorted(conf)[-1]
-    print '. SetupProject.sh LCGCMT ' + conf[rootver] + ' ROOT pytools'
-    
+    # SetupProject no longer works.
+    #print '. SetupProject.sh LCGCMT ' + conf[rootver] + ' ROOT pytools'
+    args = ['lb-run', '--ext', 'root', '--ext', 'pytools', '--sh', 'LCG/' + conf[rootver]]
+    proc = subprocess.Popen(args,
+                            stdout = subprocess.PIPE,
+                            stderr = subprocess.PIPE)
+    stdout, stderr = proc.communicate()
+    if proc.poll() != 0 :
+        print 'Failed to call', ' '.join(args), ', exit code', proc.poll()
+        print stderr
+        sys.exit(1)
+    for line in stdout.split('\n') :
+        # don't change the prompt.
+        if 'PS1=' in line or '_=' in line :
+            continue
+        print line
+
 if __name__ == '__main__' :
     main()
