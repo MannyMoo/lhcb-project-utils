@@ -42,7 +42,7 @@ function gen_catalog() {
     else
         local depth=2
     fi
-    local cmd="dirac dirac-bookkeeping-genXMLCatalog --Options=$fname --Catalog=tmpcatalog.xml --Depth=$depth"
+    local cmd="dirac dirac-bookkeeping-genXMLCatalog --Options=$fname --Catalog=tmpcatalog.xml --Depth=$depth ${@:2}"
     eval "$cmd"
     local xmlcode=$?
     if [ 0 != $xmlcode ] ; then
