@@ -4,7 +4,7 @@ function dirac() {
     eval "lb-run -c x86_64-slc6-gcc49-opt LHCbDirac/prod $@"
 }
 
-function get_lfns() {
+function dirac_get_lfns() {
     # Take the arguments of dirac-bookkeeping-get-files then echo a
     # list of lfns with all the other info stripped out.
     output=$(dirac dirac-bookkeeping-get-files $@ | grep '/lhcb')
@@ -16,11 +16,12 @@ function get_lfns() {
     echo "$output" | awk '{print $1;}'
 }
 
-function save_files() {
+function dirac_save_files() {
+    # Save the LFNs from a BK query as an input file.
     outputfname=$1
     bkargs=${@:2}
     echo $bkargs
-    lfns=$(get_lfns $bkargs)
+    lfns=$(dirac_get_lfns $bkargs)
     echo "# lb-run LHCbDirac/prod dirac-bookkeeping-get-files $bkargs
 
 from Gaudi.Configuration import *
@@ -34,7 +35,8 @@ IOHelper('ROOT').inputFiles([" > $outputfname
 " >> $outputfname
 }
 
-function gen_catalog() {
+function dirac_gen_catalog() {
+    # Generate the xml catalog for a data file.
     local fname=$1
     local rdst=$(grep '\.rdst' $fname)
     if [ -z "$rdst" ] ; then
@@ -62,4 +64,48 @@ from Gaudi.Configuration import FileCatalog
 FileCatalog().Catalogs += [ 'xmlcatalog_file:${PWD}/${xmlname}', 'xmlcatalog_file:${xmlname}' ]
 " >> $fname
     fi
+}
+
+function dirac_get_data_settings() {
+    # Get the settings for a data file from the production information:
+    # DataType, InputType, CondDBtag, DDDBtag, Simulation.
+    lfn=$(grep -o '/lhcb.*dst' $1 | head -n 1)
+    echo "LFN: $lfn"
+    bkpath=$(dirac dirac-bookkeeping-file-path -l $lfn | tail -n 1 | awk '{print $3;}')
+    echo "Bk path: $bkpath"
+    prod=$(dirac dirac-bookkeeping-prod4path -B $bkpath | grep ':' | head -n 2 | tail -n 1 |  awk '{print $2;}')
+    echo "Production: $prod"
+    prodinfo=$(dirac dirac-bookkeeping-production-information $prod)
+    opts=$(echo "$prodinfo" | grep 'OptionFiles.*DaVinci' | awk '{print $3}' | sed 's/;/ /g')
+    settings="
+'''
+$prodinfo
+'''
+
+from Configurables import DaVinci
+from Gaudi.Configuration import importOptions
+
+"
+    echo "Options:"
+    for opt in $(echo ${opts/\$/\$}) ; do
+	if [ ! -z "$(echo $opt | grep DataType)" ] || [ ! -z "$(echo $opt | grep InputType)" ] ; then
+	    settings+="importOptions('$opt')
+"
+	    echo "${opt/\$/\$}"
+	fi
+    done
+    dddb=$(echo "$prodinfo" | grep dddb | tail -n 1 | awk '{print $3;}')
+    conddb=$(echo "$prodinfo" | grep CONDDB | tail -n 1 | awk '{print $3;}')
+    echo "Tags: $dddb $conddb"
+    settings+="DaVinci().CondDBtag = '$conddb'
+DaVinci().DDDBtag = '$dddb'
+"
+    if [ ! -z "$(echo $conddb | grep sim)" ] ; then
+	echo "Simulation: True"
+	settings+="DaVinci().Simulation = True
+"
+    else
+	echo "Simulation: False"
+    fi
+    echo "$settings" > ${1/\.py/_settings.py}
 }
