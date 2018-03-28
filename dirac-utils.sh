@@ -4,6 +4,20 @@ function dirac() {
     eval "lb-run -c x86_64-slc6-gcc49-opt LHCbDirac/prod $@"
 }
 
+function dirac_check_proxy() {
+    # Check time left on your dirac proxy, if it's less than the first argument 
+    # in hours (default 12), then renew the proxy with 2 weeks validity.
+    hrsleft=$(lhcb-proxy-info | grep timeleft | sed 's/:/ /g' | awk '{print $2;}')
+    if [ ! -z "$1" ] ; then
+	hrslimit="$1"
+    else
+	hrslimit="12"
+    fi
+    if [ "$hrsleft" -lt "$hrslimit" ] ; then
+	lhcb-proxy-init -v "$[24*14]:00"
+    fi
+}
+
 function dirac_get_lfns() {
     # Take the arguments of dirac-bookkeeping-get-files then echo a
     # list of lfns with all the other info stripped out.
