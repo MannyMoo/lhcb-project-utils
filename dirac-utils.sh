@@ -87,7 +87,7 @@ function dirac_get_data_settings() {
     echo "LFN: $lfn"
     bkpath=$(dirac dirac-bookkeeping-file-path -l $lfn | tail -n 1 | awk '{print $3;}')
     echo "Bk path: $bkpath"
-    prod=$(dirac dirac-bookkeeping-prod4path -B $bkpath | grep ':' | head -n 2 | tail -n 1 |  awk '{print $2;}')
+    prod=$(dirac dirac-bookkeeping-prod4path -B $bkpath | grep -v 'Merge' | grep ':' | head -n 2 | tail -n 1 | sed 's/,/ /g' | awk '{print $NF;}')
     echo "Production: $prod"
     prodinfo=$(dirac dirac-bookkeeping-production-information $prod)
     opts=$(echo "$prodinfo" | grep 'OptionFiles.*DaVinci' | awk '{print $3}' | sed 's/;/ /g')
@@ -102,14 +102,21 @@ from Gaudi.Configuration import importOptions
 "
     echo "Options:"
     for opt in $(echo ${opts/\$/\$}) ; do
-	if [ ! -z "$(echo $opt | grep DataType)" ] || [ ! -z "$(echo $opt | grep InputType)" ] ; then
+	if [ ! -z "$(echo $opt | grep DataType)" ] ; then
 	    settings+="importOptions('$opt')
 "
 	    echo "${opt/\$/\$}"
 	fi
     done
+    
+    inputtype=$(python -c "print '$lfn'.split('.')[-1].upper()")
+    echo "Input type: $inputtype"
+    settings+="DaVinci().InputType = '$inputtype'
+"
+
     dddb=$(echo "$prodinfo" | grep dddb | tail -n 1 | awk '{print $3;}')
     conddb=$(echo "$prodinfo" | grep CONDDB | tail -n 1 | awk '{print $3;}')
+    
     echo "Tags: $dddb $conddb"
     settings+="DaVinci().CondDBtag = '$conddb'
 DaVinci().DDDBtag = '$dddb'
