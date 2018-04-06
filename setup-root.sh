@@ -70,6 +70,7 @@ function setup_root_lhcb() {
 	echo "Call of"
 	echo "$LHCBPROJECTUTILSROOT/find-lcg-root-version.py $@"
 	echo "failed with exit code $exitcode"
+	echo "$cmd"
     fi
 }
 

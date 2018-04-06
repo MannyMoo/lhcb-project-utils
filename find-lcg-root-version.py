@@ -53,7 +53,8 @@ def main() :
     stdout, stderr = proc.communicate()
     if proc.poll() != 0 :
         print 'Failed to call', ' '.join(args), ', exit code', proc.poll()
-        print stderr
+        print 'stdout:', stdout
+        print 'stderr:', stderr
         sys.exit(1)
     for line in stdout.split('\n') :
         # don't change the prompt.
