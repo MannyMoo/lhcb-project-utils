@@ -9,7 +9,7 @@ git clone git://github.com/MannyMoo/lhcb-project-utils.git
 
 echo 'export LHCBPROJECTUTILSROOT=$HOME/lib/bash/lhcb-project-utils
 source $LHCBPROJECTUTILSROOT/setup-root.sh
-setup_root
+setup_root_lhcb
 ' >> ~/.bashrc
 echo 'if [ -e ~/.bashrc ] ; then
     source ~/.bashrc
