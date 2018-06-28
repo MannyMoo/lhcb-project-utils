@@ -115,7 +115,7 @@ from Gaudi.Configuration import importOptions
 "
 
     dddb=$(echo "$prodinfo" | grep -i ddb | grep -i -v conddb | tail -n 1 | awk '{print $3;}')
-    conddb=$(echo "$prodinfo" | grep -i conddb[ | tail -n 1 | awk '{print $3;}')
+    conddb=$(echo "$prodinfo" | grep -i conddb | tail -n 1 | awk '{print $3;}')
     
     echo "Tags: $dddb $conddb"
     settings+="DaVinci().CondDBtag = '$conddb'
