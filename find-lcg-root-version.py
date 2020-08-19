@@ -4,31 +4,39 @@ import os, sys, re, subprocess
 from collections import defaultdict
 
 def get_lcg_releases() :
-    lcgreleasedir = filter(lambda d : 'lcg/releases' in d, 
-                           os.environ['LCG_release_area'].split(':'))[0]
+    lcgreleasedir = os.environ['LCG_RELEASES']
 
-    lcgdirs = filter(lambda d : os.path.isdir(os.path.join(lcgreleasedir, d)) and d.split(os.sep)[-1].find('LCG_') == 0, 
+    lcgdirs = filter(lambda d : os.path.isdir(os.path.join(lcgreleasedir, d)) and os.path.split(d)[-1].startswith('LCG_'),
                      os.listdir(lcgreleasedir))
-    confs = defaultdict(lambda : defaultdict(dict))
+    confs = defaultdict(lambda : defaultdict(list))
     for d in lcgdirs :
+        lcgver = d[4:]
+        # Avoid any non-standard releases and python3 (for now).
+        if '_' in lcgver or 'python3' in lcgver:
+            continue
         d = os.path.join(lcgreleasedir, d)
         rootdir = os.path.join(d, 'ROOT')
         if not os.path.isdir(rootdir) :
             continue 
         rootver = os.listdir(rootdir)[0]
-        if not rootver[0].isdigit() :
+        if not (rootver[0].isdigit() or (rootver.startswith('v') and rootver[1].isdigit())):
             continue
         cmtconfs = os.listdir(os.path.join(d, 'ROOT', rootver))
         for conf in cmtconfs :
-            confs[conf][rootver] = d.split(os.sep)[-1].split('_')[-1]
+            confs[conf][rootver.strip('v')].append(lcgver)
     return confs
     
 def main() :
     if not 'CMTCONFIG' in os.environ :
-        print 'CMTCONFIG is not defined, can\'t find ROOT version!'
-        sys.exit(1)
+        with open('/etc/redhat-release') as f:
+            release = f.read()
+        if 'CentOS' in release:
+            cmtconf = 'x86_64-centos7-gcc9-opt'
+        else:
+            cmtconf = 'x86_64-slc6-gcc8-opt'
+    else:
+        cmtconf = os.environ['CMTCONFIG']
     confs = get_lcg_releases()
-    cmtconf = os.environ['CMTCONFIG']
     if not cmtconf in confs :
         print 'Can\'t find ROOT version for CMTCONFIG', cmtconf + '!'
         sys.exit(1)
@@ -44,7 +52,7 @@ def main() :
             rootver = sorted(matchvers)[-1]
     else :
         rootver = sorted(conf)[-1]
-    args = ['lb-run', '--ext', 'root', '--ext', 'pytools', '--sh', '-c', cmtconf, 'LCG/' + conf[rootver]]
+    args = ['lb-run', '--ext', 'root', '--ext', 'pytools', '--sh', '-c', cmtconf, 'LCG/' + sorted(conf[rootver])[-1]]
     proc = subprocess.Popen(args,
                             stdout = subprocess.PIPE,
                             stderr = subprocess.PIPE)
@@ -60,9 +68,14 @@ def main() :
     #         continue
     #     print line
     args.remove('--sh')
+    args = ' '.join(args)
     print '''function root-env() {
-    %s $@
-}''' % ' '.join(args)
+    if [ $# -eq 0 ] ; then
+        ROOTENV=1 %s $SHELL
+    else
+        ROOTENV=1 %s $@
+    fi
+}''' % (args, args)
 
 if __name__ == '__main__' :
     main()

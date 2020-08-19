@@ -49,6 +49,9 @@ function setup_lhcb_env() {
 }
 
 function setup_root_lhcb() {
+    if [ ! -z "$ROOTENV" ] ; then
+	return
+    fi
     if [ -z "`which lb-run 2> /dev/null`" ]
     then
 	setup_lhcb_env
