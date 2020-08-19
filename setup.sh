@@ -16,3 +16,4 @@ echo 'if [ -e ~/.bashrc ] ; then
 fi
 ' >> ~/.bash_profile
 source ~/.bashrc
+cd -
