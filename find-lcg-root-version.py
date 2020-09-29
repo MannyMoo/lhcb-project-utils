@@ -31,7 +31,9 @@ def main() :
         with open('/etc/redhat-release') as f:
             release = f.read()
         if 'CentOS' in release:
-            cmtconf = 'x86_64-centos7-gcc9-opt'
+            # LCG 97a with gcc9 doesn't pick up the correct gcc path for some reason.
+            #cmtconf = 'x86_64-centos7-gcc9-opt'
+            cmtconf = 'x86_64-centos7-gcc8-opt'
         else:
             cmtconf = 'x86_64-slc6-gcc8-opt'
     else:
