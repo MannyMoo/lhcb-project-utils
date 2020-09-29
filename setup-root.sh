@@ -3,7 +3,10 @@
 # Setup the LHCb environment and ROOT.
 
 function setup_lhcb_env() {
-    . /cvmfs/lhcb.cern.ch/lib/LbEnv-stable.sh
+    if [ -e ~/.lbenv_flavour ] ; then
+	flav=-$(cat ~/.lbenv_flavour)
+    fi
+    . /cvmfs/lhcb.cern.ch/lib/LbEnv$flav
 }
 
 function setup_root_lhcb() {

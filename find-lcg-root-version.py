@@ -38,7 +38,7 @@ def main() :
         cmtconf = os.environ['CMTCONFIG']
     confs = get_lcg_releases()
     if not cmtconf in confs :
-        print 'Can\'t find ROOT version for CMTCONFIG', cmtconf + '!'
+        print('Can\'t find ROOT version for CMTCONFIG', cmtconf + '!')
         sys.exit(1)
     conf = confs[cmtconf]
     if len(sys.argv) > 1 :
@@ -46,8 +46,8 @@ def main() :
         if not rootver in conf :
             matchvers = filter(lambda ver : re.match(rootver, ver), conf)
             if not matchvers :
-                print 'No match for ROOT version', rootver, ' for CMTCONFIG', cmtconf
-                print 'Available versions are', sorted(conf.keys())
+                print('No match for ROOT version', rootver, ' for CMTCONFIG', cmtconf)
+                print('Available versions are', sorted(conf.keys()))
                 sys.exit(1)
             rootver = sorted(matchvers)[-1]
     else :
@@ -58,9 +58,9 @@ def main() :
                             stderr = subprocess.PIPE)
     stdout, stderr = proc.communicate()
     if proc.poll() != 0 :
-        print 'Failed to call', ' '.join(args), ', exit code', proc.poll()
-        print 'stdout:', stdout
-        print 'stderr:', stderr
+        print('Failed to call', ' '.join(args), ', exit code', proc.poll())
+        print('stdout:', stdout)
+        print('stderr:', stderr)
         sys.exit(1)
     # for line in stdout.split('\n') :
     #     # don't change the prompt.
@@ -69,13 +69,13 @@ def main() :
     #     print line
     args.remove('--sh')
     args = ' '.join(args)
-    print '''function root-env() {
+    print('''function root-env() {
     if [ $# -eq 0 ] ; then
         ROOTENV=1 %s $SHELL
     else
         ROOTENV=1 %s $@
     fi
-}''' % (args, args)
+}''' % (args, args))
 
 if __name__ == '__main__' :
     main()
