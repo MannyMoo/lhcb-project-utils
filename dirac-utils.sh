@@ -130,3 +130,8 @@ DaVinci().DDDBtag = '$dddb'
     fi
     echo "$settings" > ${1/\.py/_settings.py}
 }
+
+function dirac_prep_proxy() {
+    # Prepare a new proxy for use
+    lb-dirac dirac-cert-convert.sh $1
+}
